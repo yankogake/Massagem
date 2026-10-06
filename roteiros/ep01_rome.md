@@ -44,7 +44,7 @@ And that's where it blew up. Today, if you order "Fettuccine Alfredo" in most of
 
 While we're at it: Caesar salad?
 Not Julius. Not Rome. Not even Italy.
-It was created in Tijuana, Mexico, in the 1920s, by a restaurant owner named Caesar Cardini.
+It was created in Tijuana, Mexico, in the 1920s, by an Italian immigrant and restaurant owner named Caesar Cardini.
 Julius Caesar never had a single crouton. Poor guy.
 
 ---
@@ -193,7 +193,7 @@ Psst... see you there.
 | # | Short | Gancho de abertura (primeiros 2 s) |
 |---|---|---|
 | 1 | Fettuccine Alfredo | "This pasta is way more famous in America than in Rome." |
-| 2 | Caesar salad | "Caesar salad isn't Italian. Not even close." |
+| 2 | Caesar salad | "Caesar salad isn't from Italy. Not even close." |
 | 3 | Spanish Steps | "Sit on these stairs in Rome and you might get fined." |
 | 4 | Nasoni | "Rome has a secret water fountain trick." |
 | 5 | Imposto do xixi | "A Roman emperor taxed... pee." |
