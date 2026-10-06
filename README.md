@@ -9,15 +9,15 @@ Resultado: [`harmonie-divulgacao.mp4`](harmonie-divulgacao.mp4)
 
 | Tempo | Cena | Som |
 |---|---|---|
-| 0–2 s | **Gancho**: fotos piscando no ritmo + "Americana, anota esse *endereço.*" | batida abafada + riser |
-| 2–4 s | Logo **harmonie** com flash | impacto (drop) + brilho |
+| 0–2 s | **Gancho**: fotos em fusão suave + "Americana, anota esse *endereço.*" | batida abafada + riser |
+| 2–4 s | Logo **harmonie** com clarão suave | impacto (drop) + brilho |
 | 4–11,5 s | 5 serviços, um a cada 3 batidas, com barra de progresso | whoosh em cada corte |
 | 11,5–14 s | Grade com 9 fotos: "Tudo em *um só lugar.*" | pop a cada foto |
 | 14–20 s | Chamada: "*Agende* seu horário", endereço, @, WhatsApp, "Envie pra quem merece esse cuidado." | pausa + riser → impacto, sino no logo |
 
 Por que funciona melhor nas redes:
-- **gancho nos 2 primeiros segundos** (movimento + frase direta) para segurar quem está rolando o feed;
-- **cortes sincronizados com a batida**, que dão ritmo e aumentam o tempo assistido;
+- **gancho nos 2 primeiros segundos** (fotos em fusão + frase direta) para segurar quem está rolando o feed;
+- **trocas de cena no tempo da música**, com movimentos suaves (sem pulsar), que dão ritmo sem cansar;
 - **pedido de compartilhamento** no final ("Envie pra quem merece…"), que gera envios por DM;
 - textos dentro da **área segura do Reels** (não ficam atrás da legenda nem dos botões);
 - áudio normalizado em **-14 LUFS**, o padrão das redes sociais.

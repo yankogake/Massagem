@@ -70,7 +70,7 @@
 <body>
 <div id="palco">
 
-  <!-- 1. gancho (fundo escuro, fotos piscando no ritmo) -->
+  <!-- 1. gancho (fundo escuro, fotos em fusão) -->
   <div id="c1" class="cena" style="background:var(--noite)">
     <div id="h-foto" class="abs"></div>
     <div id="h-veu" class="abs"></div>
@@ -121,8 +121,7 @@ const BPM = 120, BATIDA = 60 / BPM;
 const DURACAO = 20;
 const FPS = 30;
 
-const GANCHO = ["unhas-vermelhas", "cabelo-loiro", "estetica-facial", "unhas-rosa",
-                "massagem-corpo", "cabelo-escuro", "led-facial", "unhas-anel"];
+const GANCHO = ["unhas-vermelhas", "cabelo-loiro", "estetica-facial", "massagem-corpo"];
 const SERVICOS = [
   { foto: "unhas-anel",       nome: "Nails",     sub: "Esmalteria Express" },
   { foto: "cabelo-loiro",     nome: "Cabelos",   sub: "Salão de Beleza" },
@@ -186,12 +185,9 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const prog = (t, a, b) => clamp((t - a) / (b - a));
 const outExpo = x => x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
 const outCubic = x => 1 - Math.pow(1 - x, 3);
-const outBack = x => 1 + 2.2 * Math.pow(x - 1, 3) + 1.2 * Math.pow(x - 1, 2);
 const inOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 const lerp = (a, b, x) => a + (b - a) * x;
 const dentro = (t, [a, b]) => t >= a && t < b;
-// pulso que decai após cada batida (usado para "bater" a imagem no ritmo)
-const pulso = (t, desde = 0) => t < desde ? 0 : Math.exp(-((t - desde) % BATIDA) / .1);
 
 function sobe(el, t, ini, dur = .7, sai = Infinity) {
   const p = outExpo(prog(t, ini, ini + dur));
@@ -211,20 +207,14 @@ function mostra(id, faixa, t) {
 }
 
 function render(t) {
-  // --- 1. gancho: uma foto por meia batida, texto entra a cada batida ---
+  // --- 1. gancho: uma foto por batida, em fusão suave com zoom lento ---
   if (mostra("c1", C1, t)) {
-    const fotos = $("h-foto").children;
-    const atual = Math.min(fotos.length - 1, Math.floor(t / (BATIDA / 2)));
-    [...fotos].forEach((im, i) => {
-      im.style.display = i === atual ? "" : "none";
-      const local = t - i * BATIDA / 2;
-      im.style.transform = `scale(${1.18 - .06 * outCubic(clamp(local / .25))})`;
+    [...$("h-foto").children].forEach((im, i) => {
+      const ini = i * BATIDA;
+      im.style.opacity = i === 0 ? 1 : outCubic(prog(t, ini - .1, ini + .2));
+      im.style.transform = `scale(${lerp(1.1, 1, prog(t, ini - .1, C1[1]))})`;
     });
-    ["h-a", "h-b", "h-c"].forEach((id, i) => {
-      const p = outBack(prog(t, i * BATIDA, i * BATIDA + .35));
-      const el = $(id);
-      el.style.transform = `translateY(${(1 - clamp(p)) * 100}%) scale(${lerp(1.12, 1, clamp(p))})`;
-    });
+    ["h-a", "h-b", "h-c"].forEach((id, i) => sobe($(id), t, i * BATIDA, .8));
   }
 
   // --- 2. logo (impacto do drop) ---
@@ -234,7 +224,6 @@ function render(t) {
     const logo = $("l-logo");
     logo.style.opacity = prog(t, t0, t0 + .3);
     logo.style.letterSpacing = `${lerp(.3, 0, p)}em`;
-    logo.style.transform = `scale(${1 + .03 * pulso(t, t0)})`;
     $("l-linha").style.transform = `scaleX(${outExpo(prog(t, t0 + .5, t0 + 1.1))})`;
     fade($("l-sub"), t, t0 + .7, .6);
     const saida = inOut(prog(t, C2[1] - .3, C2[1]));
@@ -255,7 +244,7 @@ function render(t) {
       const rev = outExpo(prog(t, ini, ini + .5));
       cartao.style.clipPath = `inset(${(1 - rev) * 100}% 0 0 0)`;
       const zoom = lerp(1.22, 1.04, outCubic(prog(t, ini, fim + .5)));
-      cartao.querySelector("img").style.transform = `scale(${zoom * (1 + .018 * pulso(t, ini))})`;
+      cartao.querySelector("img").style.transform = `scale(${zoom})`;
       const spans = el.querySelectorAll(".rotulo .mask > span");
       spans.forEach((sp, k) => sobe(sp, t, ini + .1 + k * .07, .6, fim - .3));
       // barra de progresso dos serviços
@@ -264,7 +253,7 @@ function render(t) {
     });
   }
 
-  // --- 4. grade: fotos surgem a cada semicolcheia ---
+  // --- 4. grade: fotos surgem em sequência ---
   if (mostra("c4", C4, t)) {
     const t0 = C4[0];
     fade($("g-sub"), t, t0 + .1, .5);
@@ -273,12 +262,12 @@ function render(t) {
     [...$("g-grade").children].forEach((d, i) => {
       const ini = t_grade(i);
       const p = prog(t, ini, ini + .45);
-      d.style.opacity = clamp(p * 3);
-      d.style.transform = `scale(${lerp(.6, 1, outBack(p))})`;
-      d.querySelector("img").style.transform = `scale(${lerp(1.4, 1.05, outExpo(p))})`;
+      d.style.opacity = outCubic(p);
+      d.style.transform = `scale(${lerp(.94, 1, outExpo(p))})`;
+      d.querySelector("img").style.transform = `scale(${lerp(1.15, 1.05, outCubic(p))})`;
     });
     const sai = inOut(prog(t, C4[1] - .5, C4[1]));
-    $("g-grade").style.transform = `scale(${1 + .02 * pulso(t, t0 + 1.5) + sai * .04})`;
+    $("g-grade").style.transform = `scale(${1 + sai * .04})`;
   }
 
   // --- 5. chamada (impacto) ---
@@ -287,7 +276,6 @@ function render(t) {
     $("c5").style.clipPath = `circle(${outExpo(prog(t, t0, t0 + .6)) * 140}% at 50% 100%)`;
     sobe($("a-a"), t, t0 + .1, .8);
     sobe($("a-b"), t, t0 + .3, .8);
-    $("a-a").parentElement.style.transform = `scale(${1 + .015 * pulso(t, t0 + 1)})`;
     $("a-linha").style.transform = `scaleX(${outExpo(prog(t, t0 + .7, t0 + 1.3))})`;
     fade($("a-end"), t, t0 + 1.0, .6);
     fade($("a-ig"), t, t0 + 1.5, .6);
@@ -297,10 +285,8 @@ function render(t) {
     $("a-logo").style.letterSpacing = `${lerp(.2, 0, outExpo(pl))}em`;
   }
 
-  // flash branco nos impactos
-  const f = Math.max(1 - prog(t, C2[0], C2[0] + .35), 0) * (t >= C2[0]) +
-            Math.max(1 - prog(t, C5[0], C5[0] + .25), 0) * (t >= C5[0]) * .35;
-  $("flash").style.opacity = clamp(f) * .9;
+  // clarão suave na entrada do logo
+  $("flash").style.opacity = t >= C2[0] ? (1 - outCubic(prog(t, C2[0], C2[0] + .6))) * .6 : 0;
 }
 
 window.render = render;
