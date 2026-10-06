@@ -1,0 +1,142 @@
+"""Gera o sticker do Bartô, o pombo fofoqueiro viajante (SVG)."""
+import math, sys
+
+OUT = "#2B2F3A"   # contorno
+SW = 7            # espessura do contorno
+
+def laurel():
+    """Coroa de louros (variante Roma)."""
+    s = []
+    cx, cy, r = 500, 268, 160
+    for side in (-1, 1):
+        for i in range(7):
+            a = math.radians(200 + i * 19) if side < 0 else math.radians(340 - i * 19)
+            x, y = cx + r * math.cos(a), cy + r * math.sin(a) * 0.5
+            rot = math.degrees(a) + (90 if side < 0 else -90)
+            fill = "#6DB353" if i % 2 else "#4E9A3E"
+            s.append(f'<ellipse cx="{x:.1f}" cy="{y:.1f}" rx="16" ry="34" fill="{fill}" '
+                     f'stroke="{OUT}" stroke-width="5" transform="rotate({rot + side*35:.1f} {x:.1f} {y:.1f})"/>')
+    s.append(f'<circle cx="500" cy="190" r="13" fill="#F2C14E" stroke="{OUT}" stroke-width="5"/>')
+    return "\n".join(s)
+
+def beret():
+    """Boina (variante Paris)."""
+    return f'''<g transform="translate(0,-28)">
+    <path d="M360,250 Q370,160 500,150 Q650,150 655,245 Q600,275 500,272 Q400,272 360,250 Z"
+          fill="#D63C4A" stroke="{OUT}" stroke-width="{SW}" transform="rotate(-10 500 220)"/>
+    <path d="M492,150 q4,-26 18,-30" fill="none" stroke="{OUT}" stroke-width="9" stroke-linecap="round"
+          transform="rotate(-10 500 220)"/></g>'''
+
+def eye(cx, cy, lid_y1, lid_y2, cid):
+    return f'''
+    <clipPath id="{cid}"><circle cx="{cx}" cy="{cy}" r="50"/></clipPath>
+    <circle cx="{cx}" cy="{cy}" r="50" fill="#FFFFFF"/>
+    <g clip-path="url(#{cid})">
+      <circle cx="{cx+14}" cy="{cy+8}" r="34" fill="#FF8A1F"/>
+      <circle cx="{cx+14}" cy="{cy+8}" r="34" fill="none" stroke="#E0631A" stroke-width="5"/>
+      <circle cx="{cx+18}" cy="{cy+10}" r="17" fill="#1C1E25"/>
+      <circle cx="{cx+26}" cy="{cy+2}" r="7" fill="#FFFFFF"/>
+      <polygon points="{cx-60},{cy-70} {cx+60},{cy-70} {cx+60},{lid_y2} {cx-60},{lid_y1}" fill="#9FA9BC"/>
+      <line x1="{cx-60}" y1="{lid_y1}" x2="{cx+60}" y2="{lid_y2}" stroke="{OUT}" stroke-width="7"/>
+    </g>
+    <circle cx="{cx}" cy="{cy}" r="50" fill="none" stroke="{OUT}" stroke-width="{SW}"/>'''
+
+def build(hat="roma"):
+    hat_svg = laurel() if hat == "roma" else beret()
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
+  <defs>
+    <linearGradient id="neck" x1="0" x2="1" y1="0" y2="0.3">
+      <stop offset="0" stop-color="#1FB59A"/><stop offset="0.5" stop-color="#3C8FD8"/>
+      <stop offset="1" stop-color="#9A5BD0"/>
+    </linearGradient>
+    <filter id="sticker" x="-15%" y="-15%" width="130%" height="135%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="20" result="d"/>
+      <feFlood flood-color="#FFFFFF"/><feComposite in2="d" operator="in" result="outline"/>
+      <feGaussianBlur in="d" stdDeviation="9" result="b"/><feOffset in="b" dy="14" result="o"/>
+      <feFlood flood-color="#000" flood-opacity="0.28"/><feComposite in2="o" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#sticker)">
+    <!-- pés (um com curativo) -->
+    <g stroke="{OUT}" stroke-width="30" stroke-linecap="round" fill="none">
+      <path d="M430,820 L430,880 M430,880 L395,905 M430,880 L432,915 M430,880 L468,905"/>
+      <path d="M575,820 L575,880 M575,880 L540,905 M575,880 L577,915 M575,880 L613,905"/>
+    </g>
+    <g stroke="#E8737A" stroke-width="16" stroke-linecap="round" fill="none">
+      <path d="M430,820 L430,880 M430,880 L395,905 M430,880 L432,915 M430,880 L468,905"/>
+      <path d="M575,820 L575,880 M575,880 L540,905 M575,880 L577,915 M575,880 L613,905"/>
+    </g>
+    <rect x="592" y="888" width="34" height="18" rx="6" fill="#F4D3A8" stroke="{OUT}" stroke-width="4"
+          transform="rotate(35 609 897)"/>
+
+    <!-- corpo -->
+    <ellipse cx="500" cy="640" rx="235" ry="215" fill="#A3ADBF" stroke="{OUT}" stroke-width="{SW}"/>
+    <ellipse cx="510" cy="690" rx="150" ry="140" fill="#C9D0DC"/>
+    <!-- asa esquerda com as duas faixas pretas típicas do pombo -->
+    <path d="M290,520 Q215,620 250,760 Q300,800 345,770 Q370,650 340,540 Z"
+          fill="#8D97AB" stroke="{OUT}" stroke-width="{SW}"/>
+    <path d="M262,640 Q300,650 352,628" stroke="#2B2F3A" stroke-width="14" fill="none" stroke-linecap="round"/>
+    <path d="M258,690 Q302,700 355,680" stroke="#2B2F3A" stroke-width="14" fill="none" stroke-linecap="round"/>
+
+    <!-- colar furta-cor -->
+    <ellipse cx="500" cy="470" rx="190" ry="85" fill="url(#neck)" stroke="{OUT}" stroke-width="{SW}"/>
+
+    <!-- alça + bolsa com mapa e broches -->
+    <path d="M655,470 Q520,620 360,760" stroke="{OUT}" stroke-width="32" fill="none" stroke-linecap="round"/>
+    <path d="M655,470 Q520,620 360,760" stroke="#8B5A2B" stroke-width="20" fill="none" stroke-linecap="round"/>
+    <g transform="rotate(-10 360 790)">
+      <rect x="318" y="690" width="40" height="120" rx="18" fill="#F5E9CC" stroke="{OUT}" stroke-width="6"
+            transform="rotate(-18 338 750)"/>
+      <path d="M300,722 L322,730" stroke="#D63C4A" stroke-width="10" stroke-linecap="round" transform="rotate(-18 338 750)"/>
+      <rect x="270" y="740" width="190" height="135" rx="26" fill="#C9843F" stroke="{OUT}" stroke-width="{SW}"/>
+      <path d="M270,770 Q270,740 296,740 L434,740 Q460,740 460,770 L460,800 Q365,830 270,800 Z"
+            fill="#A9692C" stroke="{OUT}" stroke-width="{SW}"/>
+      <circle cx="365" cy="812" r="11" fill="#F2C14E" stroke="{OUT}" stroke-width="5"/>
+      <!-- broche do Brasil -->
+      <circle cx="310" cy="848" r="18" fill="#1E9E4A" stroke="{OUT}" stroke-width="5"/>
+      <polygon points="310,836 324,848 310,860 296,848" fill="#F7D417"/>
+      <circle cx="310" cy="848" r="6" fill="#23408E"/>
+      <!-- broche coração -->
+      <path d="M418,840 q-12,-14 -20,0 q-6,12 20,26 q26,-14 20,-26 q-8,-14 -20,0 Z" fill="#D63C4A" stroke="{OUT}" stroke-width="5"/>
+    </g>
+
+    <!-- cabeça -->
+    <circle cx="500" cy="340" r="160" fill="#A9B3C5" stroke="{OUT}" stroke-width="{SW}"/>
+    <!-- topete rebelde -->
+    <path d="M478,188 Q455,130 488,110 Q482,150 505,182 Z" fill="#A9B3C5" stroke="{OUT}" stroke-width="6"/>
+    <path d="M505,184 Q520,120 560,118 Q530,150 528,190 Z" fill="#A9B3C5" stroke="{OUT}" stroke-width="6"/>
+    {hat_svg}
+
+    <!-- bochechas -->
+    <ellipse cx="392" cy="402" rx="30" ry="17" fill="#F08A9A" opacity="0.55"/>
+    <ellipse cx="612" cy="402" rx="30" ry="17" fill="#F08A9A" opacity="0.55"/>
+
+    <!-- olhos: semicerrados, olhar de canto (cara de quem sabe um segredo) -->
+    {eye(440, 330, 318, 300, "eL")}
+    {eye(565, 330, 296, 312, "eR")}
+    <!-- sobrancelhas de pena: uma baixa, uma levantada -->
+    <path d="M392,262 Q440,252 482,266" stroke="{OUT}" stroke-width="13" fill="none" stroke-linecap="round"/>
+    <path d="M522,236 Q565,206 612,236" stroke="{OUT}" stroke-width="13" fill="none" stroke-linecap="round"/>
+
+    <!-- bico com a carúncula branca -->
+    <path d="M474,392 Q502,380 528,392 L508,440 Q501,450 494,440 Z" fill="#3A3F4B" stroke="{OUT}" stroke-width="6" stroke-linejoin="round"/>
+    <ellipse cx="501" cy="388" rx="22" ry="12" fill="#F1F2F5" stroke="{OUT}" stroke-width="5"/>
+
+    <!-- asa direita em concha, cochichando -->
+    <path d="M700,560 Q760,470 720,380 Q700,345 668,352 Q640,360 650,392 Q640,388 628,400 Q615,418 632,436
+             Q612,446 620,470 Q632,500 690,510 Z" fill="#8D97AB" stroke="{OUT}" stroke-width="{SW}" stroke-linejoin="round"/>
+  </g>
+
+  <!-- balão "psiu..." -->
+  <g filter="url(#sticker)" transform="rotate(8 830 200)">
+    <path d="M700,140 Q700,95 745,95 L905,95 Q950,95 950,140 L950,215 Q950,260 905,260 L800,260 L760,300 L765,260
+             L745,260 Q700,260 700,215 Z" fill="#FFE45C" stroke="{OUT}" stroke-width="{SW}"/>
+    <text x="825" y="200" text-anchor="middle" font-family="'Baloo 2','Fredoka','Arial Rounded MT Bold','DejaVu Sans',sans-serif"
+          font-weight="900" font-size="66" fill="{OUT}">psiu...</text>
+  </g>
+</svg>'''
+
+if __name__ == "__main__":
+    hat = sys.argv[1] if len(sys.argv) > 1 else "roma"
+    print(build(hat))
