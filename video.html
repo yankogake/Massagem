@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Harmonie — vídeo de divulgação</title>
+<style>
+  @font-face { font-family: "Cormorant"; src: url(assets/fontes/CormorantGaramond-Light.ttf); font-weight: 300; }
+  @font-face { font-family: "Cormorant"; src: url(assets/fontes/CormorantGaramond-LightItalic.ttf); font-weight: 300; font-style: italic; }
+  @font-face { font-family: "Jost"; src: url(assets/fontes/Jost-Light.ttf); font-weight: 300; }
+  @font-face { font-family: "Jost"; src: url(assets/fontes/Jost-Regular.ttf); font-weight: 400; }
+
+  :root {
+    --creme: #f4efe9;
+    --areia: #e7ddd2;
+    --taupe: #a3968a;
+    --cinza: #8d8783;
+    --escuro: #2a2522;
+  }
+  html, body { margin: 0; background: #111; }
+  body { display: grid; place-items: center; min-height: 100vh; }
+  body.render { display: block; min-height: 0; }
+
+  #palco {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: var(--creme); color: var(--escuro);
+    font-family: "Jost", sans-serif; font-weight: 300;
+  }
+  body:not(.render) #palco { transform-origin: center; }
+  .abs { position: absolute; }
+  .centro { left: 0; right: 0; text-align: center; }
+  .serif { font-family: "Cormorant", serif; font-weight: 300; }
+  .ital { font-style: italic; }
+  .caps { text-transform: uppercase; letter-spacing: .32em; }
+  .mask { overflow: hidden; }
+  .mask > span { display: inline-block; will-change: transform; }
+
+  /* logo */
+  .logo { font-family: "Jost"; font-weight: 300; color: var(--cinza); white-space: nowrap; }
+  .logo sup { font-size: .22em; vertical-align: .9em; margin-left: .05em; }
+
+  /* cartões de serviço */
+  .cartao { left: 80px; right: 80px; top: 230px; height: 1160px; overflow: hidden; background: var(--areia); }
+  .cartao img { width: 100%; height: 100%; object-fit: cover; display: block; transform-origin: 50% 40%; }
+  .rotulo { left: 80px; right: 80px; top: 1440px; height: 360px; background: var(--creme); }
+  .rotulo .num { font-size: 30px; letter-spacing: .3em; color: var(--taupe); }
+  .rotulo .nome { font-size: 190px; line-height: 1; margin-top: 18px; }
+  .rotulo .sub { font-size: 32px; letter-spacing: .28em; text-transform: uppercase; color: var(--cinza); margin-top: 22px; }
+
+  /* grade */
+  .grade { left: 72px; top: 560px; width: 936px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .grade div { height: 360px; overflow: hidden; background: var(--areia); }
+  .grade img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .linha { height: 2px; background: var(--taupe); }
+  .pilula { display: inline-block; border: 2px solid currentColor; border-radius: 999px; padding: 22px 52px; }
+</style>
+</head>
+<body>
+<div id="palco">
+
+  <!-- 1. abertura -->
+  <div id="c1" class="abs" style="inset:0">
+    <div id="c1-logo" class="abs centro logo" style="top:780px;font-size:170px">harmonie<sup>®</sup></div>
+    <div id="c1-linha" class="abs linha" style="top:1010px;left:390px;width:300px"></div>
+    <div id="c1-sub" class="abs centro caps" style="top:1060px;font-size:34px;color:var(--taupe)">Estética &amp; Beleza</div>
+  </div>
+
+  <!-- 2. conceito -->
+  <div id="c2" class="abs" style="inset:0">
+    <div class="abs centro caps" id="c2-top" style="top:640px;font-size:30px;color:var(--taupe)">Americana · SP</div>
+    <div class="abs centro mask serif" style="top:730px;font-size:170px;line-height:1.15"><span id="c2-a">Um novo</span></div>
+    <div class="abs centro mask serif ital" style="top:925px;font-size:170px;line-height:1.15"><span id="c2-b">conceito</span></div>
+    <div class="abs centro mask serif" style="top:1120px;font-size:120px;line-height:1.15;color:var(--cinza)"><span id="c2-c">de beleza.</span></div>
+  </div>
+
+  <!-- 3. serviços (preenchido via JS) -->
+  <div id="c3" class="abs" style="inset:0"></div>
+
+  <!-- 4. grade -->
+  <div id="c4" class="abs" style="inset:0">
+    <div class="abs centro mask serif" style="top:250px;font-size:120px;line-height:1.1"><span id="c4-a">Tudo em</span></div>
+    <div class="abs centro mask serif ital" style="top:385px;font-size:120px;line-height:1.1"><span id="c4-b">um só lugar.</span></div>
+    <div class="abs grade" id="c4-grade"></div>
+    <div id="c4-sub" class="abs centro caps" style="top:1750px;font-size:26px;color:var(--taupe)"></div>
+  </div>
+
+  <!-- 5. chamada -->
+  <div id="c5" class="abs" style="inset:0;background:var(--escuro);color:var(--creme)">
+    <div class="abs centro mask serif ital" style="top:430px;font-size:230px;line-height:1.1"><span id="c5-a">Agende</span></div>
+    <div class="abs centro mask serif" style="top:680px;font-size:120px;line-height:1.1"><span id="c5-b">seu horário</span></div>
+    <div id="c5-linha" class="abs linha" style="top:900px;left:440px;width:200px;background:var(--taupe)"></div>
+    <div id="c5-end" class="abs centro" style="top:960px;font-size:40px;line-height:1.6;letter-spacing:.04em">
+      Rua Maranhão, 2270 · Praia Azul<br><span style="color:var(--taupe)">Americana — SP</span>
+    </div>
+    <div id="c5-ig" class="abs centro" style="top:1170px;font-size:44px;letter-spacing:.06em">
+      <span class="pilula">@harmonie.americana</span>
+    </div>
+    <div id="c5-wa" class="abs centro caps" style="top:1340px;font-size:28px;color:var(--taupe)">WhatsApp · Agendamento online</div>
+    <div id="c5-logo" class="abs centro logo" style="top:1600px;font-size:96px;color:var(--creme)">harmonie<sup>®</sup></div>
+  </div>
+
+</div>
+
+<script>
+const DURACAO = 20.5;
+const FPS = 30;
+
+const SERVICOS = [
+  { foto: "unhas-anel",       nome: "Nails",     sub: "Esmalteria Express" },
+  { foto: "cabelo-loiro",     nome: "Cabelos",   sub: "Salão de Beleza" },
+  { foto: "estetica-facial",  nome: "Estética",  sub: "Estética Avançada" },
+  { foto: "massagem-corpo",   nome: "Massagem",  sub: "Corpo & Bem-estar" },
+  { foto: "led-facial",       nome: "Pele",      sub: "Limpeza & LED" },
+];
+const GRADE = ["unhas-rosa", "cabelo-escuro", "unhas-vermelhas",
+               "estetica-facial", "unhas-nude", "massagem-corpo",
+               "unhas-pele-negra", "cabelo-loiro", "led-facial"];
+
+// cenas: [início, fim]
+const C1 = [0, 2.6], C2 = [2.6, 4.6], C3 = [4.6, 13.6], C4 = [13.6, 16.6], C5 = [16.6, DURACAO];
+const PASSO = (C3[1] - C3[0]) / SERVICOS.length;
+
+const foto = n => `assets/fotos/${n}.jpg`;
+const $ = id => document.getElementById(id);
+
+// monta os elementos das cenas 3 e 4
+const c3 = $("c3");
+SERVICOS.forEach((s, i) => {
+  c3.insertAdjacentHTML("beforeend", `
+    <div class="abs" id="s${i}" style="inset:0">
+      <div class="abs cartao"><img src="${foto(s.foto)}"></div>
+      <div class="abs rotulo">
+        <div class="num mask"><span>0${i + 1} — 0${SERVICOS.length}</span></div>
+        <div class="nome serif ital mask"><span>${s.nome}</span></div>
+        <div class="sub mask"><span>${s.sub}</span></div>
+      </div>
+    </div>`);
+});
+$("c4-grade").innerHTML = GRADE.map(n => `<div><img src="${foto(n)}"></div>`).join("");
+$("c4-sub").textContent = "Esmalteria · Salão · Estética · Massagem";
+
+// utilidades de animação
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const outExpo = x => x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+const outCubic = x => 1 - Math.pow(1 - x, 3);
+const inOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const lerp = (a, b, x) => a + (b - a) * x;
+const dentro = (t, [a, b]) => t >= a && t < b;
+
+function sobe(el, t, ini, dur = .7, dist = 110) {          // texto que sobe de dentro da máscara
+  const p = outExpo(prog(t, ini, ini + dur));
+  el.style.transform = `translateY(${(1 - p) * dist}%)`;
+}
+function fade(el, t, ini, dur = .6, dy = 30) {
+  const p = outCubic(prog(t, ini, ini + dur));
+  el.style.opacity = p;
+  el.style.transform = `translateY(${(1 - p) * dy}px)`;
+  return p;
+}
+
+function render(t) {
+  // --- cena 1: logo ---
+  $("c1").style.display = dentro(t, C1) ? "" : "none";
+  if (dentro(t, C1)) {
+    const p = outExpo(prog(t, .15, 1.6));
+    const logo = $("c1-logo");
+    logo.style.opacity = prog(t, .15, .9);
+    logo.style.letterSpacing = `${lerp(.35, 0, p)}em`;
+    $("c1-linha").style.transform = `scaleX(${outExpo(prog(t, .9, 1.7))})`;
+    fade($("c1-sub"), t, 1.15, .7);
+    const saida = inOut(prog(t, 2.2, C1[1]));
+    $("c1").style.opacity = 1 - saida;
+    $("c1").style.transform = `translateY(${-saida * 80}px)`;
+  }
+
+  // --- cena 2: conceito ---
+  $("c2").style.display = dentro(t, C2) ? "" : "none";
+  if (dentro(t, C2)) {
+    const t0 = C2[0];
+    fade($("c2-top"), t, t0 + .05, .6);
+    ["c2-a", "c2-b", "c2-c"].forEach((id, i) => sobe($(id), t, t0 + .1 + i * .14, .8));
+    const saida = inOut(prog(t, C2[1] - .35, C2[1]));
+    $("c2").style.opacity = 1 - saida;
+    $("c2").style.transform = `scale(${1 - saida * .04})`;
+  }
+
+  // --- cena 3: serviços ---
+  $("c3").style.display = dentro(t, C3) ? "" : "none";
+  if (dentro(t, C3)) {
+    SERVICOS.forEach((s, i) => {
+      const ini = C3[0] + i * PASSO, fim = ini + PASSO;
+      const el = $(`s${i}`);
+      // fica visível até o próximo cartão cobrir totalmente
+      const visivel = t >= ini && t < fim + .5;
+      el.style.display = visivel ? "" : "none";
+      if (!visivel) return;
+      el.style.zIndex = i;
+      const cartao = el.querySelector(".cartao");
+      const img = cartao.querySelector("img");
+      const rev = outExpo(prog(t, ini, ini + .7));
+      cartao.style.clipPath = `inset(${(1 - rev) * 100}% 0 0 0)`;
+      img.style.transform = `scale(${lerp(1.25, 1.04, outCubic(prog(t, ini, fim + .5)))})`;
+      // rótulo: entra e sai
+      const spans = el.querySelectorAll(".rotulo span");
+      const out = inOut(prog(t, fim - .3, fim));
+      spans.forEach((sp, k) => {
+        const p = outExpo(prog(t, ini + .15 + k * .08, ini + .85 + k * .08));
+        sp.style.transform = `translateY(${(1 - p) * 110 - out * 110}%)`;
+      });
+    });
+  }
+
+  // --- cena 4: grade ---
+  $("c4").style.display = dentro(t, C4) ? "" : "none";
+  if (dentro(t, C4)) {
+    const t0 = C4[0];
+    sobe($("c4-a"), t, t0 + .05, .8);
+    sobe($("c4-b"), t, t0 + .18, .8);
+    [...$("c4-grade").children].forEach((d, i) => {
+      const r = Math.floor(i / 3), c = i % 3;
+      const p = outExpo(prog(t, t0 + .1 + (r + c) * .09, t0 + .9 + (r + c) * .09));
+      d.style.opacity = p;
+      d.style.transform = `scale(${lerp(.7, 1, p)})`;
+      d.querySelector("img").style.transform = `scale(${lerp(1.35, 1.05, p)})`;
+    });
+    $("c4-grade").style.transform = `translateY(${-prog(t, t0, C4[1]) * 40}px)`;
+    fade($("c4-sub"), t, t0 + .9, .7);
+  }
+
+  // --- cena 5: chamada ---
+  $("c5").style.display = t >= C5[0] ? "" : "none";
+  if (t >= C5[0]) {
+    const t0 = C5[0];
+    const abre = outExpo(prog(t, t0, t0 + .8));
+    $("c5").style.clipPath = `circle(${abre * 140}% at 50% 100%)`;
+    sobe($("c5-a"), t, t0 + .25, .9);
+    sobe($("c5-b"), t, t0 + .4, .9);
+    $("c5-linha").style.transform = `scaleX(${outExpo(prog(t, t0 + .8, t0 + 1.5))})`;
+    fade($("c5-end"), t, t0 + .95, .7);
+    fade($("c5-ig"), t, t0 + 1.25, .7);
+    fade($("c5-wa"), t, t0 + 1.5, .7);
+    const pl = fade($("c5-logo"), t, t0 + 2.0, 1.0);
+    $("c5-logo").style.letterSpacing = `${lerp(.2, 0, outExpo(pl))}em`;
+  }
+}
+
+window.render = render;
+window.DURACAO = DURACAO;
+window.FPS = FPS;
+window.pronto = Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map(i => i.decode().catch(() => {})),
+]);
+
+// pré-visualização no navegador (a renderização usa ?render)
+if (new URLSearchParams(location.search).has("render")) {
+  document.body.classList.add("render");
+  render(0);
+} else {
+  const palco = $("palco");
+  const ajusta = () => { palco.style.transform = `scale(${Math.min(innerWidth / 1080, innerHeight / 1920)})`; };
+  ajusta(); addEventListener("resize", ajusta);
+  window.pronto.then(() => {
+    const inicio = performance.now();
+    const loop = now => { render(((now - inicio) / 1000) % (DURACAO + 1)); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>
