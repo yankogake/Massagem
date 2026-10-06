@@ -1,4 +1,4 @@
-"""Gera o Bartô como bordado em tecido piquê (estilo logo bordado de camisa polo)."""
+"""Gera o Gus como bordado em tecido piquê (estilo logo bordado de camisa polo)."""
 import math, sys
 
 INK = "#262A36"   # linha do contorno

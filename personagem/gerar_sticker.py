@@ -1,4 +1,4 @@
-"""Gera o sticker do Bartô, o pombo fofoqueiro viajante (SVG)."""
+"""Gera o sticker do Gus, o pombo fofoqueiro viajante (SVG)."""
 import math, sys
 
 OUT = "#2B2F3A"   # contorno
