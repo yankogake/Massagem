@@ -244,41 +244,42 @@ def speech_segments(audio):
         segs.append((cur, dur))
     return [(a, b) for a, b in segs if b - a > 0.05], dur
 
+EXTRA_PRON = {"cardini": "K AA R D IY N IY", "peperoni": "P EH P ER OW N IY", "psst": "P S T"}
+
+def align(audio, words):
+    """Alinhamento forçado (pocketsphinx, modelo en-US offline): tempo de início de cada palavra do roteiro."""
+    from pocketsphinx import Decoder
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", audio, "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
+                         capture_output=True).stdout
+    d = Decoder(samprate=16000, loglevel="FATAL")
+    for w, ph in EXTRA_PRON.items():
+        d.add_word(w, ph, True)
+    toks, owner = [], []
+    for i, w in enumerate(words):
+        for part in re.sub(r"[^a-z'-]", "", w.lower()).split("-"):
+            if part:
+                toks.append(part); owner.append(i)
+    d.set_align_text(" ".join(toks))
+    d.start_utt(); d.process_raw(raw, full_utt=True); d.end_utt()
+    segs = [sg for sg in d.seg() if sg.word not in ("<s>", "</s>", "<sil>", "(NULL)") and not sg.word.startswith("[")]
+    assert len(segs) == len(toks), f"alinhamento incompleto: {len(segs)} de {len(toks)} palavras"
+    times = [None] * len(words)
+    for sg, i in zip(segs, owner):
+        if times[i] is None:
+            times[i] = sg.start_frame / 100.0
+    return times, len(raw) / 32000.0
+
 def word_times(audio=None):
     """Tempo (s) de início de cada palavra do roteiro, e a duração total."""
     words = [(bi, w) for bi, (_, txt, _) in enumerate(BEATS) for w in txt.split()]
-    weights = [syl(w) for _, w in words]
     if not audio:  # estimativa: 4,4 sílabas/s + pausa nas pontuações
         t, out = 0.2, []
-        for (bi, w), k in zip(words, weights):
+        for bi, w in words:
             out.append(t)
-            t += k / 4.4 + (0.3 if w[-1] in ".?:" else 0.12 if w[-1] == "," else 0)
+            t += syl(w) / 4.4 + (0.3 if w[-1] in ".?:" else 0.12 if w[-1] == "," else 0)
         return words, out, t + 1.0
-    segs, dur = speech_segments(audio)
-    speech = sum(b - a for a, b in segs)
-    total = sum(weights)
-    out, acc = [], 0.0
-    for k in weights:
-        target = acc / total * speech  # posição no "relógio só de fala"
-        for a, b in segs:              # converte para o tempo real
-            if target <= b - a:
-                out.append(a + target); break
-            target -= b - a
-        else:
-            out.append(segs[-1][1])
-        acc += k
-    # cada beat começa no início de um trecho de fala (pausas reais são as fronteiras naturais)
-    starts = [a for a, _ in segs]
-    for bi in range(len(BEATS)):
-        idx = next(i for i, (b, _) in enumerate(words) if b == bi)
-        near = min(starts, key=lambda s: abs(s - out[idx]))
-        if abs(near - out[idx]) < 0.7:
-            shift = near - out[idx]
-            j = idx
-            while j < len(words) and words[j][0] == bi:
-                out[j] += shift * (1 - (j - idx) / max(1, sum(1 for b, _ in words if b == bi)))
-                j += 1
-    return words, out, dur + 1.2
+    times, dur = align(audio, [w for _, w in words])
+    return words, times, dur + 1.2
 
 def timeline(audio=None):
     words, wt, dur = word_times(audio)
