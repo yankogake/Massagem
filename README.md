@@ -11,7 +11,7 @@ Resultado: [`harmonie-divulgacao.mp4`](harmonie-divulgacao.mp4)
 |---|---|---|
 | 0–2 s | **Gancho**: fotos em fusão suave + "Americana, anota esse *endereço.*" | batida abafada + riser |
 | 2–4 s | Logo **harmonie** com clarão suave | impacto (drop) + brilho |
-| 4–11,5 s | 5 serviços, um a cada 3 batidas, com barra de progresso | whoosh em cada corte |
+| 4–11,5 s | 5 serviços (Unhas, Cabelos, Estética, Massagem, Pele), títulos centralizados, com barra de progresso | whoosh em cada corte |
 | 11,5–14 s | Grade com 9 fotos: "Tudo em *um só lugar.*" | pop a cada foto |
 | 14–20 s | Chamada: "*Agende* seu horário", endereço, @, WhatsApp, "Envie pra quem merece esse cuidado." | pausa + riser → impacto, sino no logo |
 
