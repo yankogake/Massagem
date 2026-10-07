@@ -203,6 +203,52 @@ POPS = {"flag": 0.95, "flagx": 2.15, "t0": 3.19, "t1": 4.29, "t2": 5.23, "pin": 
 POPS.update({f"i{i}": 17.2 + i * 0.08 for i in range(14)})
 TEAR, CROUTON_DROP = 19.1, 20.4
 
+# Versão rápida: se existir o mapa gerado por acelerar_voz.py, reposiciona tudo na voz acelerada.
+MAPA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "voz_short01_mapa.json")
+if os.path.exists(MAPA):
+    _m = json.load(open(MAPA))
+    _old, _new = [p[0] for p in _m["points"]], [p[1] for p in _m["points"]]
+
+    def remap(t):
+        if t >= _old[-1]:
+            return _new[-1] + (t - _old[-1]) / _m["tempo"]
+        for i in range(1, len(_old)):
+            if t <= _old[i]:
+                a0, a1, b0, b1 = _old[i - 1], _old[i], _new[i - 1], _new[i]
+                return b0 + (t - a0) * (b1 - b0) / max(a1 - a0, 1e-9)
+        return _new[-1]
+
+    AUDIO = "voz_short01_rapida.wav"
+    _starts = [round(remap(a), 3) for _, a, _ in SCENES]
+    DURATION = round(_new[-1] + 0.9, 2)
+    SCENES = [(sid, _starts[i], _starts[i + 1] if i + 1 < len(SCENES) else DURATION) for i, (sid, _, _) in enumerate(SCENES)]
+    CAPTIONS = [(round(remap(a), 3), round(remap(b), 3), txt) for a, b, txt in CAPTIONS]
+    CAPTIONS[-1] = (CAPTIONS[-1][0], DURATION, CAPTIONS[-1][2])
+    _ing = remap(17.2)
+    POPS = {k: round(remap(v), 3) for k, v in POPS.items() if not k.startswith("i")}
+    POPS.update({f"{sid}h": a + 0.03 for sid, a, _ in SCENES if sid != "s7"})
+    POPS.update({f"i{i}": round(_ing + i * 0.07, 3) for i in range(14)})
+    TEAR, CROUTON_DROP = round(remap(TEAR), 3), round(remap(CROUTON_DROP), 3)
+
+FALL, BOUNCE = 0.35, 0.3  # queda e quique do crouton (s)
+
+
+def sfx_events():
+    """Eventos sonoros [tempo, tipo, variação] alinhados às animações."""
+    ev = []
+    for k, t in POPS.items():
+        if k in ("flagx", "t0", "t1", "t2"):
+            ev.append([t, "stamp", 0])
+        elif k.startswith("s") and k.endswith("h"):
+            ev.append([t, "tick", 0])
+        elif k.startswith("i"):
+            ev.append([t, "pop", int(k[1:])])  # sobe de tom a cada ingrediente
+        else:
+            ev.append([t, "pop", 0])
+    ev += [[a - 0.1, "whoosh", 0] for _, a, _ in SCENES[1:]]
+    ev.append([CROUTON_DROP + FALL, "bonk", 0])
+    return sorted(ev)
+
 JS = """
 const clamp = x => Math.max(0, Math.min(1, x));
 const outBack = t => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
@@ -226,21 +272,24 @@ function caption(t) {
   $('capg').setAttribute('transform', `translate(540,1395) scale(${s}) translate(-540,-1395)`);
 }
 function setT(t, frame) {
-  $('turb').setAttribute('seed', [7, 11, 19][Math.floor(frame / 2) % 3]);
+  $('turb').setAttribute('seed', [7, 11, 19][Math.floor(t * 6) % 3]);
   for (const [id, a, b] of SCENES) {
     const el = $(id), on = t >= a && t < b;
     el.style.display = on ? '' : 'none';
     if (on) {
-      const k = 1.07 - 0.07 * outBack(clamp((t - a) / 0.25)) + 0.035 * (t - a) / (b - a);
+      // entrada rápida + zoom lento + "soquinho" de câmera a cada item que aparece
+      let kick = 0;
+      for (const t0 of Object.values(POPS)) if (t0 >= a && t >= t0) kick += 0.03 * Math.exp(-(t - t0) * 12);
+      const k = 1.10 - 0.10 * outBack(clamp((t - a) / 0.16)) + 0.04 * (t - a) / (b - a) + kick;
       el.setAttribute('transform', `translate(540,900) scale(${k}) translate(-540,-900)`);
     }
   }
   for (const [id, t0] of Object.entries(POPS)) {
-    const el = $(id); if (el) scaleAround(el, outBack(clamp((t - t0) / 0.22)));
+    const el = $(id); if (el) scaleAround(el, outBack(clamp((t - t0) / 0.15)));
   }
   // Gus respira / balança
   for (const id of ['g1', 'g6', 'g7']) {
-    $(id).setAttribute('transform', `translate(0,${Math.sin(t * 4.2) * 10}) rotate(${Math.sin(t * 2.6) * 3} 500 560)`);
+    $(id).setAttribute('transform', `translate(0,${Math.sin(t * 5.5) * 10}) rotate(${Math.sin(t * 3.4) * 3} 500 560)`);
   }
   // lágrima do César
   const tl = ((t - TEAR) % 1.2 + 1.2) % 1.2;
@@ -249,8 +298,8 @@ function setT(t, frame) {
   // croûton cai e quica na base do busto
   const ct = t - CROUTON_DROP;
   let cy = -700;
-  if (ct > 0) { const g = Math.min(ct, 0.45) / 0.45; cy = -700 + 700 * g * g;
-    if (ct > 0.45) { const b = (ct - 0.45) / 0.35; cy = b < 1 ? -90 * Math.sin(Math.PI * b) : 0; } }
+  if (ct > 0) { const g = Math.min(ct, FALL) / FALL; cy = -700 + 700 * g * g;
+    if (ct > FALL) { const b = (ct - FALL) / BOUNCE; cy = b < 1 ? -90 * Math.sin(Math.PI * b) : 0; } }
   $('cr').setAttribute('transform', `translate(0,${cy}) rotate(${ct > 0 ? Math.min(ct, 0.8) * 200 : 0} 400 448)`);
   if (SHOW_CAPTIONS) caption(t);
 }
@@ -273,7 +322,8 @@ def build():
 </svg>'''
     data = (f"const SCENES = {json.dumps(SCENES)};\nconst CAPTIONS = {json.dumps(CAPTIONS)};\n"
             f"const HIGHLIGHT = {json.dumps(HIGHLIGHT)};\nconst POPS = {json.dumps(POPS)};\n"
-            f"const TEAR = {TEAR}, CROUTON_DROP = {CROUTON_DROP}, SHOW_CAPTIONS = {json.dumps(SHOW_CAPTIONS)};\n")
+            f"const TEAR = {TEAR}, CROUTON_DROP = {CROUTON_DROP}, FALL = {FALL}, BOUNCE = {BOUNCE}, "
+            f"SHOW_CAPTIONS = {json.dumps(SHOW_CAPTIONS)};\n")
     return f'''<!doctype html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=block" rel="stylesheet">
 <style>body{{margin:0;background:#000}}</style></head><body>{svg}
@@ -285,4 +335,9 @@ def srt():
     return "\n".join(f"{i}\n{ts(a)} --> {ts(b)}\n{t}\n" for i, (a, b, t) in enumerate(CAPTIONS, 1))
 
 if __name__ == "__main__":
-    print(srt() if "--srt" in sys.argv else build())
+    if "--srt" in sys.argv:
+        print(srt())
+    elif "--sfx" in sys.argv:
+        print(json.dumps({"duration": DURATION, "audio": AUDIO, "events": sfx_events()}))
+    else:
+        print(build())

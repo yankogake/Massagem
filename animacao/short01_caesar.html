@@ -351,11 +351,11 @@
   <g id="capg"><text id="cap" style="white-space:pre" word-spacing="10" x="540" y="1420" text-anchor="middle" font-family="'Baloo 2',sans-serif" font-weight="800"
      font-size="86" stroke="#262A36" stroke-width="16" stroke-linejoin="round" paint-order="stroke"></text></g>
 </svg>
-<script>const SCENES = [["s1", 0.0, 3.05], ["s2", 3.05, 6.75], ["s3", 6.75, 10.07], ["s4", 10.07, 13.05], ["s5", 13.05, 18.8], ["s6", 18.8, 21.95], ["s7", 21.95, 26.3]];
-const CAPTIONS = [[0.0, 0.95, "Caesar salad"], [0.99, 2.1, "isn't from Italy."], [2.15, 3.15, "Not even close."], [3.19, 4.25, "Not Julius."], [4.29, 5.2, "Not Rome."], [5.23, 6.85, "Not even Italy."], [6.89, 8.95, "It was invented in Tijuana, Mexico,"], [8.98, 10.15, "in the 1920s,"], [10.17, 11.5, "by an Italian immigrant"], [11.52, 13.15, "named Caesar Cardini."], [13.18, 13.78, "Legend says"], [13.8, 15.6, "on a busy Fourth of July,"], [15.65, 17.1, "the kitchen ran low,"], [17.17, 18.9, "so he tossed in what he had."], [18.93, 20.5, "Julius Caesar never had"], [20.52, 22.05, "a single crouton."], [22.09, 23.05, "Psst..."], [23.1, 26.3, "Follow for more secrets."]];
+<script>const SCENES = [["s1", 0.0, 2.405], ["s2", 2.405, 5.146], ["s3", 5.146, 8.007], ["s4", 8.007, 10.269], ["s5", 10.269, 14.774], ["s6", 14.774, 17.187], ["s7", 17.187, 20.41]];
+const CAPTIONS = [[0.0, 0.811, "Caesar salad"], [0.837, 1.651, "isn't from Italy."], [1.669, 2.444, "Not even close."], [2.462, 3.349, "Not Julius."], [3.37, 4.093, "Not Rome."], [4.107, 5.166, "Not even Italy."], [5.176, 7.016, "It was invented in Tijuana, Mexico,"], [7.042, 8.065, "in the 1920s,"], [8.079, 9.267, "by an Italian immigrant"], [9.285, 10.286, "named Caesar Cardini."], [10.291, 10.824, "Legend says"], [10.842, 12.388, "on a busy Fourth of July,"], [12.414, 13.613, "the kitchen ran low,"], [13.643, 14.792, "so he tossed in what he had."], [14.8, 16.202, "Julius Caesar never had"], [16.22, 17.205, "a single crouton."], [17.212, 17.741, "Psst..."], [17.752, 20.41, "Follow for more secrets."]];
 const HIGHLIGHT = ["Italy.", "Tijuana,", "Mexico,", "Italian", "Cardini.", "Fourth", "July,", "crouton.", "secrets.", "1920s,"];
-const POPS = {"flag": 0.95, "flagx": 2.15, "t0": 3.19, "t1": 4.29, "t2": 5.23, "pin": 7.9, "year": 8.98, "name": 11.55, "fire": 14.4, "g7b": 22.05, "s1h": 0.05, "s2h": 3.1, "s3h": 6.8, "s4h": 10.12, "s5h": 13.1, "s6h": 18.85, "i0": 17.2, "i1": 17.279999999999998, "i2": 17.36, "i3": 17.439999999999998, "i4": 17.52, "i5": 17.599999999999998, "i6": 17.68, "i7": 17.759999999999998, "i8": 17.84, "i9": 17.919999999999998, "i10": 18.0, "i11": 18.08, "i12": 18.16, "i13": 18.24};
-const TEAR = 19.1, CROUTON_DROP = 20.4, SHOW_CAPTIONS = false;
+const POPS = {"flag": 0.811, "flagx": 1.669, "t0": 2.462, "t1": 3.37, "t2": 4.107, "pin": 6.078, "year": 7.042, "name": 9.312, "fire": 11.378, "g7b": 17.205, "s1h": 0.03, "s2h": 2.4349999999999996, "s3h": 5.176, "s4h": 8.036999999999999, "s5h": 10.299, "s6h": 14.803999999999998, "i0": 13.669, "i1": 13.739, "i2": 13.809, "i3": 13.879, "i4": 13.949, "i5": 14.019, "i6": 14.089, "i7": 14.159, "i8": 14.229, "i9": 14.299, "i10": 14.369, "i11": 14.439, "i12": 14.509, "i13": 14.579};
+const TEAR = 14.952, CROUTON_DROP = 16.113, FALL = 0.35, BOUNCE = 0.3, SHOW_CAPTIONS = false;
 
 const clamp = x => Math.max(0, Math.min(1, x));
 const outBack = t => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
@@ -379,21 +379,24 @@ function caption(t) {
   $('capg').setAttribute('transform', `translate(540,1395) scale(${s}) translate(-540,-1395)`);
 }
 function setT(t, frame) {
-  $('turb').setAttribute('seed', [7, 11, 19][Math.floor(frame / 2) % 3]);
+  $('turb').setAttribute('seed', [7, 11, 19][Math.floor(t * 6) % 3]);
   for (const [id, a, b] of SCENES) {
     const el = $(id), on = t >= a && t < b;
     el.style.display = on ? '' : 'none';
     if (on) {
-      const k = 1.07 - 0.07 * outBack(clamp((t - a) / 0.25)) + 0.035 * (t - a) / (b - a);
+      // entrada rápida + zoom lento + "soquinho" de câmera a cada item que aparece
+      let kick = 0;
+      for (const t0 of Object.values(POPS)) if (t0 >= a && t >= t0) kick += 0.03 * Math.exp(-(t - t0) * 12);
+      const k = 1.10 - 0.10 * outBack(clamp((t - a) / 0.16)) + 0.04 * (t - a) / (b - a) + kick;
       el.setAttribute('transform', `translate(540,900) scale(${k}) translate(-540,-900)`);
     }
   }
   for (const [id, t0] of Object.entries(POPS)) {
-    const el = $(id); if (el) scaleAround(el, outBack(clamp((t - t0) / 0.22)));
+    const el = $(id); if (el) scaleAround(el, outBack(clamp((t - t0) / 0.15)));
   }
   // Gus respira / balança
   for (const id of ['g1', 'g6', 'g7']) {
-    $(id).setAttribute('transform', `translate(0,${Math.sin(t * 4.2) * 10}) rotate(${Math.sin(t * 2.6) * 3} 500 560)`);
+    $(id).setAttribute('transform', `translate(0,${Math.sin(t * 5.5) * 10}) rotate(${Math.sin(t * 3.4) * 3} 500 560)`);
   }
   // lágrima do César
   const tl = ((t - TEAR) % 1.2 + 1.2) % 1.2;
@@ -402,8 +405,8 @@ function setT(t, frame) {
   // croûton cai e quica na base do busto
   const ct = t - CROUTON_DROP;
   let cy = -700;
-  if (ct > 0) { const g = Math.min(ct, 0.45) / 0.45; cy = -700 + 700 * g * g;
-    if (ct > 0.45) { const b = (ct - 0.45) / 0.35; cy = b < 1 ? -90 * Math.sin(Math.PI * b) : 0; } }
+  if (ct > 0) { const g = Math.min(ct, FALL) / FALL; cy = -700 + 700 * g * g;
+    if (ct > FALL) { const b = (ct - FALL) / BOUNCE; cy = b < 1 ? -90 * Math.sin(Math.PI * b) : 0; } }
   $('cr').setAttribute('transform', `translate(0,${cy}) rotate(${ct > 0 ? Math.min(ct, 0.8) * 200 : 0} 400 448)`);
   if (SHOW_CAPTIONS) caption(t);
 }
