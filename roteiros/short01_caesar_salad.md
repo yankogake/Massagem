@@ -1,6 +1,8 @@
 # Short 01: "Caesar salad isn't from Italy" (~36 s)
 
-Vídeo: `animacao/gus_short01_caesar_salad.mp4` (gerado por `animacao/short01_caesar.py`).
+Vídeo final com voz: `animacao/gus_short01_caesar_salad_voz.mp4` (26,3 s, voz "Larry" do ElevenLabs em `animacao/voz_short01.mp3`).
+As cenas foram sincronizadas com as pausas da fala; sem legendas embutidas. Legendas prontas para o CapCut: `animacao/short01_caesar.srt`.
+A tabela abaixo é o roteiro original; os tempos reais estão em `CAPTIONS`/`SCENES` no `animacao/short01_caesar.py`.
 Voz do Gus: grave, levemente rouca, sotaque de Nova York, tom de fofoca. Os tempos abaixo são os das legendas; a voz deve caber neles (ou ajustamos os tempos ao áudio).
 
 | Tempo | Cena | Narração (inglês) |

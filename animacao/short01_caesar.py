@@ -181,22 +181,27 @@ def scenes():
 
 # ---------- linha do tempo ----------
 
-SCENES = [("s1", 0.0, 4.2), ("s2", 4.2, 9.0), ("s3", 9.0, 15.0), ("s4", 15.0, 19.5),
-          ("s5", 19.5, 27.0), ("s6", 27.0, 31.5), ("s7", 31.5, 36.0)]
+# Tempos sincronizados com a narração (voz "Larry", ElevenLabs, 25,3 s), a partir das pausas da fala.
+AUDIO = "voz_short01.mp3"
+DURATION = 26.3
+SCENES = [("s1", 0.0, 3.05), ("s2", 3.05, 6.75), ("s3", 6.75, 10.07), ("s4", 10.07, 13.05),
+          ("s5", 13.05, 18.8), ("s6", 18.8, 21.95), ("s7", 21.95, 26.3)]
 CAPTIONS = [
-    (0.0, 1.6, "Caesar salad"), (1.6, 2.7, "isn't from Italy."), (2.7, 4.2, "Not even close."),
-    (4.2, 5.6, "Not Julius."), (5.6, 7.0, "Not Rome."), (7.0, 9.0, "Not even Italy."),
-    (9.0, 10.6, "It was invented"), (10.6, 12.4, "in Tijuana, Mexico,"), (12.4, 15.0, "in the 1920s,"),
-    (15.0, 17.0, "by an Italian immigrant"), (17.0, 19.5, "named Caesar Cardini."),
-    (19.5, 21.2, "Legend says"), (21.2, 23.0, "on a busy Fourth of July,"), (23.0, 24.8, "the kitchen ran low,"),
-    (24.8, 25.9, "so he tossed in"), (25.9, 27.0, "what he had."),
-    (27.0, 29.0, "Julius Caesar never had"), (29.0, 31.5, "a single crouton."),
-    (31.5, 33.3, "Psst..."), (33.3, 36.0, "Follow for more secrets."),
+    (0.0, 0.95, "Caesar salad"), (0.99, 2.1, "isn't from Italy."), (2.15, 3.15, "Not even close."),
+    (3.19, 4.25, "Not Julius."), (4.29, 5.2, "Not Rome."), (5.23, 6.85, "Not even Italy."),
+    (6.89, 8.95, "It was invented in Tijuana, Mexico,"), (8.98, 10.15, "in the 1920s,"),
+    (10.17, 11.5, "by an Italian immigrant"), (11.52, 13.15, "named Caesar Cardini."),
+    (13.18, 13.78, "Legend says"), (13.8, 15.6, "on a busy Fourth of July,"), (15.65, 17.1, "the kitchen ran low,"),
+    (17.17, 18.9, "so he tossed in what he had."),
+    (18.93, 20.5, "Julius Caesar never had"), (20.52, 22.05, "a single crouton."),
+    (22.09, 23.05, "Psst..."), (23.1, 26.3, "Follow for more secrets."),
 ]
+SHOW_CAPTIONS = False  # legendas ficam por conta do CapCut (ver short01_caesar.srt)
 HIGHLIGHT = ["Italy.", "Tijuana,", "Mexico,", "Italian", "Cardini.", "Fourth", "July,", "crouton.", "secrets.", "1920s,"]
-POPS = {"flag": 2.6, "flagx": 2.9, "t0": 4.3, "t1": 5.7, "t2": 7.1, "pin": 10.6, "year": 12.6, "name": 17.0,
-        "fire": 21.3, "g7b": 32.0, "s1h": 0.05, "s2h": 4.25, "s3h": 9.05, "s4h": 15.05, "s5h": 19.55, "s6h": 27.05}
-POPS.update({f"i{i}": 24.8 + i * 0.13 for i in range(14)})
+POPS = {"flag": 0.95, "flagx": 2.15, "t0": 3.19, "t1": 4.29, "t2": 5.23, "pin": 7.9, "year": 8.98, "name": 11.55,
+        "fire": 14.4, "g7b": 22.05, "s1h": 0.05, "s2h": 3.1, "s3h": 6.8, "s4h": 10.12, "s5h": 13.1, "s6h": 18.85}
+POPS.update({f"i{i}": 17.2 + i * 0.08 for i in range(14)})
+TEAR, CROUTON_DROP = 19.1, 20.4
 
 JS = """
 const clamp = x => Math.max(0, Math.min(1, x));
@@ -238,16 +243,16 @@ function setT(t, frame) {
     $(id).setAttribute('transform', `translate(0,${Math.sin(t * 4.2) * 10}) rotate(${Math.sin(t * 2.6) * 3} 500 560)`);
   }
   // lágrima do César
-  const tl = ((t - 27.3) % 1.2 + 1.2) % 1.2;
+  const tl = ((t - TEAR) % 1.2 + 1.2) % 1.2;
   $('tear').setAttribute('transform', `translate(0,${tl * 120})`);
-  $('tear').style.opacity = t > 27.3 ? 1 - tl / 1.2 : 0;
+  $('tear').style.opacity = t > TEAR ? 1 - tl / 1.2 : 0;
   // croûton cai e quica na base do busto
-  const ct = t - 29.2;
+  const ct = t - CROUTON_DROP;
   let cy = -700;
   if (ct > 0) { const g = Math.min(ct, 0.45) / 0.45; cy = -700 + 700 * g * g;
     if (ct > 0.45) { const b = (ct - 0.45) / 0.35; cy = b < 1 ? -90 * Math.sin(Math.PI * b) : 0; } }
   $('cr').setAttribute('transform', `translate(0,${cy}) rotate(${ct > 0 ? Math.min(ct, 0.8) * 200 : 0} 400 448)`);
-  caption(t);
+  if (SHOW_CAPTIONS) caption(t);
 }
 """
 
@@ -267,11 +272,17 @@ def build():
      font-size="86" stroke="{INK}" stroke-width="16" stroke-linejoin="round" paint-order="stroke"></text></g>
 </svg>'''
     data = (f"const SCENES = {json.dumps(SCENES)};\nconst CAPTIONS = {json.dumps(CAPTIONS)};\n"
-            f"const HIGHLIGHT = {json.dumps(HIGHLIGHT)};\nconst POPS = {json.dumps(POPS)};\n")
+            f"const HIGHLIGHT = {json.dumps(HIGHLIGHT)};\nconst POPS = {json.dumps(POPS)};\n"
+            f"const TEAR = {TEAR}, CROUTON_DROP = {CROUTON_DROP}, SHOW_CAPTIONS = {json.dumps(SHOW_CAPTIONS)};\n")
     return f'''<!doctype html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=block" rel="stylesheet">
 <style>body{{margin:0;background:#000}}</style></head><body>{svg}
 <script>{data}{JS}</script></body></html>'''
 
+def srt():
+    """Legendas em .srt para importar no CapCut."""
+    ts = lambda x: f"{int(x//3600):02d}:{int(x%3600//60):02d}:{int(x%60):02d},{int(round(x%1*1000)):03d}"
+    return "\n".join(f"{i}\n{ts(a)} --> {ts(b)}\n{t}\n" for i, (a, b, t) in enumerate(CAPTIONS, 1))
+
 if __name__ == "__main__":
-    print(build())
+    print(srt() if "--srt" in sys.argv else build())
