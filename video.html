@@ -125,8 +125,7 @@ const GANCHO = ["unhas-pretas", "cabelo-loiro", "estetica-facial", "massagem-cor
 const SERVICOS = [
   { foto: "unhas-anel",       nome: "Unhas",     sub: "Esmalteria Express" },
   { foto: "cabelo-loiro",     nome: "Cabelos",   sub: "Salão de Beleza" },
-  { foto: "estetica-facial",  nome: "Estética",  sub: "Estética Avançada" },
-  { foto: "massagem-corpo",   nome: "Massagem",  sub: "Corpo & Bem-estar" },
+  { foto: "estetica-facial",  nome: "Estética Corporal", sub: "Estética Avançada" },
   { foto: "led-facial",       nome: "Pele",      sub: "Limpeza & LED" },
 ];
 const GRADE = ["unhas-rosa", "cabelo-escuro", "unhas-vermelhas",
@@ -134,8 +133,8 @@ const GRADE = ["unhas-rosa", "cabelo-escuro", "unhas-vermelhas",
                "unhas-pele-negra", "cabelo-loiro", "led-facial"];
 
 // cenas [início, fim] — todas começam numa batida
-const C1 = [0, 2], C2 = [2, 4], C3 = [4, 11.5], C4 = [11.5, 14], C5 = [14, DURACAO];
-const PASSO = (C3[1] - C3[0]) / SERVICOS.length;                  // 1,5 s = 3 batidas
+const C1 = [0, 2], C2 = [2, 4], C3 = [4, 12], C4 = [12, 14.5], C5 = [14.5, DURACAO];
+const PASSO = (C3[1] - C3[0]) / SERVICOS.length;                  // 2 s = 1 compasso
 const ORDEM_GRADE = [0, 4, 8, 2, 6, 1, 5, 3, 7];                   // ordem em que as fotos surgem
 const t_grade = i => C4[0] + .25 + ORDEM_GRADE.indexOf(i) * BATIDA / 4;
 
@@ -173,7 +172,7 @@ SERVICOS.forEach((s, i) => {
           <div class="num mask"><span>0${i + 1} / 0${SERVICOS.length}</span></div>
           <div class="trilho"><div class="barra"></div></div>
         </div>
-        <div class="nome serif ital mask"><span>${s.nome}</span></div>
+        <div class="nome serif ital mask"${s.nome.length > 10 ? ' style="font-size:112px"' : ""}><span>${s.nome}</span></div>
         <div class="sub mask"><span>${s.sub}</span></div>
       </div>
     </div>`);
@@ -231,7 +230,7 @@ function render(t) {
     $("c2").style.transform = `translateY(${-saida * 120}px)`;
   }
 
-  // --- 3. serviços: um a cada 3 batidas ---
+  // --- 3. serviços: um por compasso ---
   if (mostra("c3", C3, t)) {
     SERVICOS.forEach((s, i) => {
       const ini = C3[0] + i * PASSO, fim = ini + PASSO;
