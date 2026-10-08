@@ -121,20 +121,19 @@ const BPM = 120, BATIDA = 60 / BPM;
 const DURACAO = 20;
 const FPS = 30;
 
-const GANCHO = ["unhas-pretas", "cabelo-loiro", "estetica-facial", "massagem-corpo"];
+const GANCHO = ["unhas-pretas", "cabelo-loiro", "estetica-facial", "estetica-corporal"];
 const SERVICOS = [
   { foto: "unhas-anel",       nome: "Unhas",     sub: "Esmalteria Express" },
   { foto: "cabelo-loiro",     nome: "Cabelos",   sub: "Salão de Beleza" },
-  { foto: "estetica-facial",  nome: "Estética Corporal", sub: "Estética Avançada" },
-  { foto: "led-facial",       nome: "Pele",      sub: "Limpeza & LED" },
+  { foto: "estetica-corporal", nome: "Estética Corporal", sub: "Estética Avançada", pos: "50% 15%" },
 ];
 const GRADE = ["unhas-rosa", "cabelo-escuro", "unhas-vermelhas",
-               "estetica-facial", "unhas-nude", "massagem-corpo",
+               "estetica-facial", "unhas-nude", "estetica-corporal",
                "unhas-pele-negra", "cabelo-loiro", "led-facial"];
 
 // cenas [início, fim] — todas começam numa batida
-const C1 = [0, 2], C2 = [2, 4], C3 = [4, 12], C4 = [12, 14.5], C5 = [14.5, DURACAO];
-const PASSO = (C3[1] - C3[0]) / SERVICOS.length;                  // 2 s = 1 compasso
+const C1 = [0, 2], C2 = [2, 4], C3 = [4, 11.5], C4 = [11.5, 14], C5 = [14, DURACAO];
+const PASSO = (C3[1] - C3[0]) / SERVICOS.length;                  // 2,5 s = 5 batidas
 const ORDEM_GRADE = [0, 4, 8, 2, 6, 1, 5, 3, 7];                   // ordem em que as fotos surgem
 const t_grade = i => C4[0] + .25 + ORDEM_GRADE.indexOf(i) * BATIDA / 4;
 
@@ -166,7 +165,7 @@ $("h-foto").innerHTML = GANCHO.map(n => `<img src="${foto(n)}">`).join("");
 SERVICOS.forEach((s, i) => {
   $("c3").insertAdjacentHTML("beforeend", `
     <div class="cena" id="s${i}">
-      <div class="abs cartao"><img src="${foto(s.foto)}"></div>
+      <div class="abs cartao"><img src="${foto(s.foto)}"${s.pos ? ` style="object-position:${s.pos}"` : ""}></div>
       <div class="abs rotulo">
         <div class="topo">
           <div class="num mask"><span>0${i + 1} / 0${SERVICOS.length}</span></div>
@@ -230,7 +229,7 @@ function render(t) {
     $("c2").style.transform = `translateY(${-saida * 120}px)`;
   }
 
-  // --- 3. serviços: um por compasso ---
+  // --- 3. serviços: um a cada 5 batidas ---
   if (mostra("c3", C3, t)) {
     SERVICOS.forEach((s, i) => {
       const ini = C3[0] + i * PASSO, fim = ini + PASSO;
